@@ -47,17 +47,6 @@ const App = () => {
     { id: 38, name: "Action Camera", price: 3500, category: "Electronics", stock: 8, isPublished: true },
     { id: 39, name: "Gaming Chair", price: 4500, category: "Furniture", stock: 12, isPublished: true },
     { id: 40, name: "Desk Lamp", price: 250, category: "Home Appliances", stock: 30, isPublished: true },
-
-    { id: 41, name: "Monitor Stand", price: 600, category: "Accessories", stock: 20, isPublished: true },
-    { id: 42, name: "Portable Fan", price: 350, category: "Home Appliances", stock: 25, isPublished: true },
-    { id: 43, name: "Shower Speaker", price: 300, category: "Electronics", stock: 18, isPublished: true },
-    { id: 44, name: "Coffee Maker", price: 1800, category: "Home Appliances", stock: 10, isPublished: false },
-    { id: 45, name: "Toaster", price: 800, category: "Home Appliances", stock: 20, isPublished: true },
-    { id: 46, name: "Bedside Table", price: 1500, category: "Furniture", stock: 15, isPublished: true },
-    { id: 47, name: "Desk Organizer", price: 400, category: "Accessories", stock: 40, isPublished: true },
-    { id: 48, name: "Hair Dryer", price: 1200, category: "Electronics", stock: 25, isPublished: true },
-    { id: 49, name: "USB Hub", price: 500, category: "Electronics", stock: 50, isPublished: true },
-    { id: 50, name: "LED Strip Lights", price: 750, category: "Electronics", stock: 30, isPublished: true }
   ];
 
 
@@ -66,7 +55,37 @@ const App = () => {
   const [isPublished, setIsPublished] = useState(false)
   const [sortBy, setSortBy] = useState("")
   const [price, setPrice] = useState(1500)
-  const [page, setPage] = useState(2)
+  const [page, setPage] = useState(1)
+  const [cart, setCart] = useState([])
+
+  const addToCart = (product) => {
+    setCart((prevCart) => {
+      const existingItem = prevCart.find((item) => item.id === product.id)
+      if (existingItem) {
+        return prevCart.map((item) =>
+          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        )
+      }
+      else {
+        return [...prevCart, { ...product, quantity: 1 }]
+      }
+    })
+
+    console.log(cart)
+  }
+
+  const removeFromCart = (productId) => {
+    setCart((prevCart) => prevCart.filter((item) => item.id !== productId))
+  }
+
+  const handlePaginate = (currentPage) => {
+    if (
+      currentPage >= 1  // current page must be greater than 1
+      && currentPage <= productList.length / 10 // current page must be less than total number of pages
+      && currentPage != page // current page must be different from previous page
+    )
+      setPage(currentPage)
+  }
   return (
     <>
       <h1>Products</h1>
@@ -105,11 +124,45 @@ const App = () => {
                 <p>category : {product.category}</p>
                 <p>stock : {product.stock}</p>
                 <p>Published : {product.isPublished ? "Yes" : "No"}</p>
+                <button onClick={() => addToCart(product)}>Add to Cart</button>
 
               </div>
             ))
         }
       </div>
+
+      <h2>🛒 Cart</h2>
+      {cart.length === 0 ? (
+        <p>Cart is empty</p>
+      ) : (
+        <ul>
+          {cart.map((item) => (
+            <li key={item.id}>
+              {item.name} - ${item.price} (Qty: {item.quantity})
+              <button onClick={() => removeFromCart(item.id)}>Remove</button>
+            </li>
+          ))}
+          <h5>Total: ${cart.reduce((total, item) => total + item.price * item.quantity, 0)}</h5>
+        </ul>
+      )}
+
+      {products.length > 0 && (
+        <div className="pagination">
+          <span onClick={() => handlePaginate(page - 1)}>◀</span>
+          {[...Array(Math.ceil(productList.length / 10))].map((_, i) => {
+            return (
+              <span
+                key={i}
+                onClick={() => handlePaginate(i + 1)}
+                className={page === i + 1 ? `pagination_selected` : ""}
+              >{i + 1}
+              </span>
+
+            )
+          })}
+          <span onClick={() => handlePaginate(page + 1)}>▶</span>
+        </div>
+      )}
 
     </>
 

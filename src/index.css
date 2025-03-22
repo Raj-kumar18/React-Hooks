@@ -58,6 +58,25 @@ body {
     font-size: 14px;
     color: #555;
   }
+
+  .pagination{
+    display: flex
+    ;
+        align-items: center;
+        justify-content: center;
+        gap: 11px;
+  }
+  .pagination span{
+    border: 1px solid blue;
+    border-radius: 8px;
+    padding: 8px 10px;
+    cursor: pointer;
+  }
+
+  .pagination_selected{
+    background-color: dodgerblue;
+    color: white;
+  }
   
   /* Responsive Design */
   @media (max-width: 600px) {
